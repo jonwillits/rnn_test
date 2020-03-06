@@ -8,7 +8,6 @@ def main():
 
     the_network = network.SRN()
     the_network.load_model(model_name)
-    print(the_network.y_h.bias)
     the_display = display.Display(the_network)
     the_display.root.mainloop()
 
