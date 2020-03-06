@@ -18,12 +18,15 @@ class DataSet:
         self.punctuation = ['.']
         self.word_classes = [self.determiners, self.herbivores, self.plants, self.drinks,
                              self.t_verbs, self.i_verbs, self.punctuation]
+        self.word_class_string_list = ['determiners', 'herbivores', 'plants', 'drinks', 't_verbs', 'i_verbs',
+                                'punctuation']
 
         self.list_of_sentences = None
         self.num_word_types = 0
         self.num_word_tokens = 0
         self.vocab_list = []
         self.vocab_index_dict = {}
+        self.vocab_category_dict = {}
         self.word_vector_matrix = None
         self.x = None
         self.x_words = None
@@ -32,12 +35,15 @@ class DataSet:
         self.generate_sentences()
 
     def init_dataset(self):
-        for word_class in self.word_classes:
+        for i in range(len(self.word_classes)):
+            word_class = self.word_classes[i]
+            word_class_string = self.word_class_string_list[i]
             for word in word_class:
                 self.vocab_list.append(word)
+                self.vocab_category_dict[word] = word_class_string
                 self.vocab_index_dict[word] = self.num_word_types
                 self.num_word_types += 1
-        self.word_vector_matrix = np.eye(self.num_word_types)
+        self.word_vector_matrix = np.float32(np.eye(self.num_word_types).astype(float))
 
     def generate_sentences(self):
         self.list_of_sentences = []
@@ -82,7 +88,6 @@ class DataSet:
                 word_index = self.vocab_index_dict[word]
                 word_vector = self.word_vector_matrix[word_index, :]
                 word_tensor = torch.from_numpy(word_vector)
-
                 self.x.append(word_tensor)
                 self.x_words.append(word)
 

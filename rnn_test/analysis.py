@@ -2,18 +2,17 @@
 import torch
 
 
-def train_model(model, training_set, test_set, optimizer, num_epochs, learning_rate):
-    if optimizer == 'Adam':
-        torch_optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    elif optimizer == 'SGD':
-        torch_optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
-    else:
-        torch_optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+def train_model(model, training_set, test_set, num_epochs, learning_rate):
+
+    torch_optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
     for e in range(num_epochs):
         training_set.create_x(True)
+        h = model.init_hidden_state()
         for i in range(len(training_set.x)-1):
-            o, loss = model.train_item(training_set.x[i], training_set.x[i+1], torch_optimizer)
+            h, z_o, o, o_prob = model.train_item(training_set.x[i], h, training_set.x[i+1], torch_optimizer)
+            if i % 100 == 0:
+                print("Finished", e, i)
 
         evaluate_network(model, test_set)
 
@@ -21,13 +20,28 @@ def train_model(model, training_set, test_set, optimizer, num_epochs, learning_r
 def evaluate_network(model, test_set):
 
     test_set.create_x(False)
+    h = model.init_hidden_state()
     for i in range(len(test_set.x)-1):
-        o, h = model.forward_item(test_set.x[i])
+        h, z_o, o, o_prob = model.forward_item(test_set.x[i], h)
         print()
-        print(test_set.x_words[i], test_set.x_words[i+1])
+        print("x:", test_set.x_words[i])
         print(test_set.x[i])
+        print()
+        print("h_x:")
+        print(model.h_x.bias)
+        print(model.h_x.weight)
+        print()
+        print("h:", h)
+        print()
+        print("y_h:")
+        print(model.y_h.bias)
+        print(model.y_h.weight)
+        print()
         print(test_set.x[i+1])
-        print(model.softmax(o))
+        print(test_set.x_words[i+1])
+        print()
+        print("o:", o)
+        print("o_prob:", o_prob)
 
         """             CAT1        CAT2        CAT3 ....
             Epoch 1     .04         .04         .04      
