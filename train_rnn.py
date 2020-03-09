@@ -1,22 +1,23 @@
-from rnn_test import dataset
-from rnn_test import network
-from rnn_test import analysis
+from rnn_test.networks import srn
+from rnn_test.analysis import analysis
+from rnn_test.language import simple_animal_world
 
 
 def main():
 
-    num_train_sentences = 100
-    num_test_sentences = 10
     num_epochs = 2
     hidden_size = 12
     learning_rate = 0.05
     weight_init = 0.01
+    training_corpus_file = None
+    test_corpus_file = None
 
-    training_dataset = dataset.DataSet(num_train_sentences)
-    test_dataset = dataset.DataSet(num_test_sentences)
-    my_network = network.SRN()
-    my_network.init_model(training_dataset, hidden_size, learning_rate, weight_init)
-    analysis.train_model(my_network, training_dataset, test_dataset, num_epochs, learning_rate)
+    training_corpus = simple_animal_world.SimpleAnimalWorld()
+    test_corpus = simple_animal_world.SimpleAnimalWorld()
+
+    my_network = srn.SRN()
+    my_network.init_model(training_corpus, hidden_size, learning_rate, weight_init)
+    analysis.train_model(my_network, training_corpus, test_corpus, num_epochs, learning_rate)
     my_network.save_model()
 
 

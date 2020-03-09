@@ -6,19 +6,23 @@ import sys
 class Display:
 
     def __init__(self, the_network):
-        # todo make sure the properties of the dataset (rows, columns, maybe other things are same as network's
+        # todo make sure the properties of the language (rows, columns, maybe other things are same as network's
 
         self.the_network = the_network
 
         self.height = 900
         self.width = 1200
+        self.entry_height = 50
+        self.button_height = 20
 
         self.root = tk.Tk()
         self.root.title("Visualize SRN")
 
-        self.entry_frame = tk.Frame(self.root, height=200, width=self.width, bd=0, padx=0, pady=0)
-        self.graph_frame = tk.Frame(self.root, height=self.height-220, width=self.width, bd=0, padx=0, pady=0)
-        self.button_frame = tk.Frame(self.root, height=20, bg="white", width=self.width, bd=0, padx=0, pady=0)
+        self.entry_frame = tk.Frame(self.root, height=self.entry_height, width=self.width, bd=0, padx=0, pady=0)
+        self.graph_frame = tk.Frame(self.root,
+                                    height=self.height-self.entry_height-self.button_height, width=self.width,
+                                    bd=0, padx=0, pady=0)
+        self.button_frame = tk.Frame(self.root, height=self.button_height, bg="white", width=self.width, bd=0, padx=0, pady=0)
 
         self.entry_frame.pack()
         self.graph_frame.pack()
