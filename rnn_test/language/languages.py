@@ -18,7 +18,7 @@ class Language:
         self.num_categories = 0
 
         self.vocab_list = []
-        self.vocab_dict = {}
+        self.vocab_index_dict = {}
         self.vocab_size = 0
 
     def init_language(self):
@@ -30,7 +30,7 @@ class Language:
             for word_label in self.init_dict[category_label]:
                 word_object = Token(word_label, category_label, self.vocab_size)
                 self.vocab_list.append(word_object)
-                self.vocab_dict[word_label] = word_object
+                self.vocab_index_dict[word_label] = word_object
                 self.vocab_size += 1
                 category_object.add_word(word_object)
 
@@ -67,6 +67,7 @@ class Language:
         sentence.add_word(choose_next(index, 'D'))
         sentence.add_word(random.choice(self.category_dict['.'].member_list))
         return sentence
+
 
 class Category:
 

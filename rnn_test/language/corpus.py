@@ -4,7 +4,8 @@ import pickle
 
 class Corpus:
 
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self.language = None
 
         self.document_list = None
@@ -36,7 +37,6 @@ class Corpus:
                         self.vocab_index_dict[token.label] = self.num_types
                         self.num_types += 1
                         self.vocab_freq_dict[token.label] = 0
-                        self.vocab_list.append(token.label)
                     self.vocab_freq_dict[token.label] += 1
 
                 new_document.add_sentence(new_sentence)
@@ -44,18 +44,22 @@ class Corpus:
             self.document_list.append(new_document)
             self.num_tokens += new_document.num_tokens
 
+        counter = 0
         for i in range(self.language.vocab_size):
             word = self.language.vocab_list[i].label
             if word in self.vocab_index_dict:
-                print(word, self.vocab_index_dict[word], self.vocab_freq_dict[word])
+                self.vocab_list.append(word)
+                self.vocab_index_dict[word] = counter
+                counter += 1
 
-    def save(self, name):
+    def save_corpus(self):
+
         try:
-            os.mkdir('corpora/' + name)
+            os.mkdir('corpora/' + self.name)
         except RuntimeError:
             print("Could not generate corpus directory {}. Does it already exist?".format(name))
 
-        f = open('corpora/' + name + '/language_vocab_list.txt', 'w')
+        f = open('corpora/' + self.name + '/language_vocab_list.txt', 'w')
         for token in self.language.vocab_list:
             if token.label in self.vocab_freq_dict:
                 freq = self.vocab_freq_dict[token.label]
@@ -64,7 +68,7 @@ class Corpus:
             f.write('{} {} {} {}\n'.format(token.index, token.label, token.category, freq))
         f.close()
 
-        f = open('corpora/' + name + '/corpus_vocab_list.txt', 'w')
+        f = open('corpora/' + self.name + '/corpus_vocab_list.txt', 'w')
         for token in self.language.vocab_list:
             if token.label in self.vocab_index_dict:
                 index = self.vocab_index_dict[token.label]
@@ -75,7 +79,7 @@ class Corpus:
                 f.write('{} {} {} {}\n'.format(index, token.label, token.category, freq))
         f.close()
 
-        f = open('corpora/' + name + '/corpus.txt', 'w')
+        f = open('corpora/' + self.name + '/corpus.txt', 'w')
         for i in range(self.num_documents):
             token_list = []
             for sentence in self.document_list[i].sentence_list:
@@ -85,27 +89,29 @@ class Corpus:
             f.write(output_string)
         f.close()
 
-        file_location = "corpora/" + self.net_name + "/corpus_object.p"
+        file_location = "corpora/" + self.name + "/corpus_object.p"
         outfile = open(file_location, 'wb')
-        pickle.dump(self)
+        pickle.dump(self, outfile)
         outfile.close()
 
-        file_location = "models/" + self.net_name + "/vocab.csv"
-        f = open(file_location, 'w')
-        for word in self.training_set.vocab_list:
-            f.write('{},{}\n'.format(word, self.training_set.vocab_category_dict[word]))
-        f.close()
+    def load_corpus(self, name):
+        self.name = name
+        corpus_file_name = "corpora/" + name + "/corpus_object.p"
+        corpus_file = open(corpus_file_name, 'rb')
+        corpus_object = pickle.load(corpus_file)
+        corpus_file.close()
 
-    def load_model(self, model_name):
-        weight_file = "models/" + model_name + "/weights.csv"
-        self.net_name = model_name
-        weight_file = open(weight_file, 'rb')
-        weights_list = pickle.load(weight_file)
-        weight_file.close()
+        self.language = corpus_object.language
 
-        self.h_x = weights_list[0]
-        self.y_h = weights_list[1]
+        self.document_list = corpus_object.document_list
+        self.num_documents = corpus_object.num_documents
+        self.num_sentences = corpus_object.num_sentences
 
+        self.num_types = corpus_object.num_types
+        self.num_tokens = corpus_object.num_tokens
+        self.vocab_list = corpus_object.vocab_list
+        self.vocab_index_dict = corpus_object.vocab_index_dict
+        self.vocab_freq_dict = corpus_object.vocab_freq_dict
 
     def __str__(self):
         output_string = 'Corpus(' + self.language.name + ',' + str(self.num_documents) + ')'
