@@ -1,7 +1,0 @@
-0 the determiners 1
-1 a determiners 1
-2 cow herbivores 1
-3 deer herbivores 1
-4 slept i_verbs 1
-5 ran i_verbs 1
-6 . punctuation 2

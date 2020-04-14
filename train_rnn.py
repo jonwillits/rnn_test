@@ -9,8 +9,8 @@ def main():
     hidden_size = 12
     learning_rate = 0.05
     weight_init = 0.01
-    training_corpus_file = None
-    test_corpus_file = None
+    training_corpus = 'test_2'
+    test_corpus = 'test_2'
 
     training_corpus = simple_animal_world.SimpleAnimalWorld()
     test_corpus = simple_animal_world.SimpleAnimalWorld()

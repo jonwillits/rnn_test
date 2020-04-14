@@ -9,7 +9,7 @@ class Dataset:
 
     def __init__(self):
         self.corpus = None
-        self.num_types = None
+        self.vocab_size = None
         self.vocab_list = []
         self.vocab_index_dict = {}
         self.vocab_vector_dict = None
@@ -20,25 +20,25 @@ class Dataset:
     def load_corpus(self, corpus, use_lang_vocab=False):
         self.corpus = corpus
         if use_lang_vocab:
-            self.num_types = corpus.language_num_types
+            self.vocab_size = corpus.language.vocab_size
             self.vocab_list = corpus.language.vocab_list
-            self.vocab_index_dict = corpus.language.vocab_dict
+            self.vocab_index_dict = corpus.language.vocab_index_dict
         else:
-            self.num_types = corpus.num_types
+            self.vocab_size = corpus.vocab_size
             self.vocab_list = corpus.vocab_list
             self.vocab_index_dict = corpus.vocab_dict
 
     def generate_one_hot_numpy_vectors(self):
-        one_hot_numpy_matrix = np.float32(np.eye(self.num_types).astype(float))
-        for i in range(self.num_types):
+        one_hot_numpy_matrix = np.float32(np.eye(self.vocab_size).astype(float))
+        for i in range(self.vocab_size):
             self.vocab_vector_dict[self.vocab_list[i]] = one_hot_numpy_matrix[i]
 
     def generate_distributed_numpy_vectors(self, size, value):
-        for i in range(self.num_types):
+        for i in range(self.vocab_size):
             self.vocab_vector_dict[self.vocab_list[i]] = np.random.uniform(-value, value, size)
 
     def convert_to_torch(self):
-        for i in range(self.num_types):
+        for i in range(self.vocab_size):
             self.vocab_vector_dict[self.vocab_list[i]] = torch.from_numpy(self.vocab_vector_dict[self.vocab_list[i]])
 
     def load_dataset(self, name):
@@ -49,7 +49,7 @@ class Dataset:
         corpus_file.close()
 
         self.corpus = dataset_object.corpus
-        self.num_types = dataset_object.num_types
+        self.vocab_size = dataset_object.num_types
         self.vocab_list = dataset_object.vocab_list
         self.vocab_index_dict = dataset_object.vocab_index_dict
         self.vocab_vector_dict = dataset_object.vocab_vector_dict

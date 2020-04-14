@@ -1,5 +1,7 @@
 import os
+import shutil
 import pickle
+import sys
 
 
 class Corpus:
@@ -12,11 +14,22 @@ class Corpus:
         self.num_documents = None
         self.num_sentences = None
 
-        self.num_types = 0
+        self.vocab_size = 0
         self.num_tokens = 0
         self.vocab_list = []
         self.vocab_index_dict = {}
         self.vocab_freq_dict = {}
+
+        if os.path.exists("corpora/" + self.name):
+            response = input("Directory {} exists. Replace? (y/n)".format(self.name))
+            if response == 'y' or response == 'Y':
+                replace = True
+            else:
+                replace = False
+            if replace:
+                shutil.rmtree("corpora/" + self.name)
+            else:
+                sys.exit()
 
     def generate_corpus(self, language, num_documents, num_sentences):
 
@@ -34,8 +47,8 @@ class Corpus:
 
                 for token in new_sentence.token_list:
                     if token.label not in self.vocab_index_dict:
-                        self.vocab_index_dict[token.label] = self.num_types
-                        self.num_types += 1
+                        self.vocab_index_dict[token.label] = self.vocab_size
+                        self.vocab_size += 1
                         self.vocab_freq_dict[token.label] = 0
                     self.vocab_freq_dict[token.label] += 1
 
@@ -56,8 +69,9 @@ class Corpus:
 
         try:
             os.mkdir('corpora/' + self.name)
-        except RuntimeError:
-            print("Could not generate corpus directory {}. Does it already exist?".format(name))
+        except:
+            print("Could not generate corpus directory {}. Does it already exist?".format(self.name))
+            sys.exit(2)
 
         f = open('corpora/' + self.name + '/language_vocab_list.txt', 'w')
         for token in self.language.vocab_list:
@@ -107,7 +121,7 @@ class Corpus:
         self.num_documents = corpus_object.num_documents
         self.num_sentences = corpus_object.num_sentences
 
-        self.num_types = corpus_object.num_types
+        self.vocab_size = corpus_object.vocab_size
         self.num_tokens = corpus_object.num_tokens
         self.vocab_list = corpus_object.vocab_list
         self.vocab_index_dict = corpus_object.vocab_index_dict
