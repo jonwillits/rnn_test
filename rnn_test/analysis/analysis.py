@@ -2,24 +2,24 @@
 import torch
 
 
-def train_model(model, training_set, test_set, num_epochs, learning_rate):
+def train_model(model, training_set, test_set, num_epochs, learning_rate, shuffle_documents, shuffle_sentences):
 
     torch_optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
     for e in range(num_epochs):
-        training_set.create_x(True)
+        training_set.create_xy(shuffle_documents, shuffle_sentences)
         h = model.init_hidden_state()
-        for i in range(len(training_set.x)-1):
-            h, z_o, o, o_prob = model.train_item(training_set.x[i], h, training_set.x[i+1], torch_optimizer)
-            if i % 100 == 0:
-                print("Finished", e, i)
-
-        evaluate_network(model, test_set)
+        # for i in range(len(training_set.x)-1):
+        #     h, z_o, o, o_prob = model.train_item(training_set.x[i], h, training_set.x[i+1], torch_optimizer)
+        #     if i % 100 == 0:
+        #         print("Finished", e, i)
+        #
+        # evaluate_network(model, test_set)
 
 
 def evaluate_network(model, test_set):
 
-    test_set.create_x(False)
+    test_set.create_xy(False, False)
     h = model.init_hidden_state()
     for i in range(len(test_set.x)-1):
         h, z_o, o, o_prob = model.forward_item(test_set.x[i], h)

@@ -10,7 +10,8 @@ class SRN(nn.Module):
     def __init__(self):
 
         super(SRN, self).__init__()
-        self.net_name = None
+        self.name = None
+        self.start_datetime = None
         self.training_set = None
 
         self.optimizer = None
@@ -42,8 +43,8 @@ class SRN(nn.Module):
         self.learning_rate = learning_rate
         self.weight_init = weight_init
 
-        self.input_size = training_set.num_word_types
-        self.output_size = training_set.num_word_types
+        self.input_size = training_set.vocab_size
+        self.output_size = training_set.vocab_size
 
         self.current_epoch = 0
 
@@ -54,13 +55,13 @@ class SRN(nn.Module):
         self.y_h.apply(self.init_weights)
 
         self.start_datetime = datetime.datetime.timetuple(datetime.datetime.now())
-        self.net_name = "{}_{}_{}_{}_{}_{}".format(self.start_datetime[1],
-                                                   self.start_datetime[2],
-                                                   self.start_datetime[3],
-                                                   self.start_datetime[4],
-                                                   self.start_datetime[5],
-                                                   self.start_datetime[6])
-        os.mkdir("models/" + self.net_name)
+        self.name = "{}_{}_{}_{}_{}_{}".format(self.start_datetime[1],
+                                               self.start_datetime[2],
+                                               self.start_datetime[3],
+                                               self.start_datetime[4],
+                                               self.start_datetime[5],
+                                               self.start_datetime[6])
+        os.mkdir("models/" + self.name)
 
     def init_weights(self, m):
         m.weight.data.uniform_(-self.weight_init, self.weight_init)
@@ -92,21 +93,20 @@ class SRN(nn.Module):
         return h, o, o_prob, loss
 
     def save_model(self):
-        file_location = "models/" + self.net_name + "/weights.csv"
+        file_location = 'models/' + self.name + '/dataset.p'
         outfile = open(file_location, 'wb')
-        weights_list = [self.h_x, self.y_h]
-        pickle.dump(weights_list, outfile)
+        pickle.dump(self, outfile)
         outfile.close()
 
-        file_location = "models/" + self.net_name + "/vocab.csv"
+        file_location = "models/" + self.name + "/vocab.csv"
         f = open(file_location, 'w')
         for word in self.training_set.vocab_list:
             f.write('{},{}\n'.format(word, self.training_set.vocab_category_dict[word]))
         f.close()
 
-    def load_model(self, model_name):
-        weight_file = "models/" + model_name + "/weights.csv"
-        self.net_name = model_name
+    def load_model(self, name):
+        weight_file = "models/" + name + "/weights.csv"
+        self.name = name
         weight_file = open(weight_file, 'rb')
         weights_list = pickle.load(weight_file)
         weight_file.close()

@@ -1,38 +1,252 @@
 import tkinter as tk
 from tkinter import ttk
 import sys
+from tkinter import *
+
+button_frame_height = 40
+content_frame_width = 800
+content_frame_height = 500
 
 
-class Display:
+class Display(tk.Tk):
 
-    def __init__(self, the_network):
-        # todo make sure the properties of the language (rows, columns, maybe other things are same as network's
-
-        self.the_network = the_network
+    def __init__(self, *args, **kwargs):
+        tk.Tk.__init__(self, *args, **kwargs)
 
         self.height = 900
         self.width = 1200
         self.entry_height = 50
         self.button_height = 20
 
-        self.root = tk.Tk()
-        self.root.title("Visualize SRN")
+        container = tk.Frame(self, height=self.height, width=self.width, bd=0, padx=0, pady=0)
+        container.pack(side="top", fill="both", expand=True)
 
-        self.entry_frame = tk.Frame(self.root, height=self.entry_height, width=self.width, bd=0, padx=0, pady=0)
-        self.graph_frame = tk.Frame(self.root,
-                                    height=self.height-self.entry_height-self.button_height, width=self.width,
-                                    bd=0, padx=0, pady=0)
-        self.button_frame = tk.Frame(self.root, height=self.button_height, bg="white", width=self.width, bd=0, padx=0, pady=0)
+        self.main_frames = {}
+        for F in (main_frame, subframe1, subframe2, subframe3):
+            page_name = F.__name__
+            frame = F(parent=container, controller=self)
+            self.main_frames[page_name] = frame
 
-        self.entry_frame.pack()
-        self.graph_frame.pack()
-        self.button_frame.pack()
+            # put all of the pages in the same location;
+            # the one on the top of the stacking order
+            # will be the one that is visible.
+            frame.grid(row=0, column=0, sticky="nsew")
 
-        self.graph_canvas = tk.Canvas(self.graph_frame, height=self.height-220, width=self.width,
-                                      bd=5, bg='#333333', highlightthickness=0, relief='ridge')
-        self.graph_canvas.pack()
+        self.show_frame("main_frame")
 
-        ttk.Style().configure("TButton", padding=0, relief="flat", background="#EEEEEE", foreground='black')
-        self.quit_button = ttk.Button(self.button_frame, text="Quit", width=8, command=sys.exit)
-        self.quit_button.pack(side=tk.LEFT, padx=4)
+    def show_frame(self, page_name):
+        '''Show a frame for the given page name'''
+        frame = self.main_frames[page_name]
+        frame.tkraise()
 
+    def load_network(self):
+        pass
+
+    def save_network(self):
+        pass
+
+    def train_network(self):
+        pass
+
+
+class main_frame(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        label = tk.Label(self, text="main_frame")
+        label.pack(side="top", fill="x", pady=5)
+
+        button_frame = tk.Frame(self, height=button_frame_height, width=content_frame_width)
+        button_frame.pack(side=TOP)
+
+        button1 = tk.Button(button_frame, text="Go to subframe1",
+                            command=lambda: controller.show_frame("subframe1"))
+        button2 = tk.Button(button_frame, text="Go to subframe2",
+                            command=lambda: controller.show_frame("subframe2"))
+        button3 = tk.Button(button_frame, text="Go to subframe3",
+                            command=lambda: controller.show_frame("subframe3"))
+        quit_button = ttk.Button(button_frame, text="Quit", width=8, command=sys.exit)
+
+        button1.pack(side=LEFT, padx=8)
+        button2.pack(side=LEFT, padx=8)
+        button3.pack(side=LEFT, padx=8)
+        quit_button.pack(side=tk.LEFT, padx=8)
+
+
+class subframe1(tk.Frame):
+    # 		content_frame1
+    # 			- what are the activations in H and Y for the current X
+    # 		user_input_frame1
+    # 			- has a text input field where you can type a word or string of words
+    # 			- ‘go’ button, that calls update for this subframe only, which redraws this subframe only
+    # 		update_screen()
+    # 			erases everything in main_frame
+    # 			draws all subframe1 objects
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        label = tk.Label(self, text="subframe1")
+        label.pack(side="top", fill="x", pady=5)
+
+        content_frame1 = tk.Frame(self, height=content_frame_height, width=content_frame_width, bd=0, padx=0, pady=0)
+        content_frame1.pack(side=BOTTOM)
+        graph_canvas = tk.Canvas(content_frame1, height=content_frame_height, width=content_frame_width,
+                                 bd=5, bg='#333333', highlightthickness=0, relief='ridge')
+        graph_canvas.pack()
+
+        button_frame1 = tk.Frame(self, height=button_frame_height, width=content_frame_width)
+        button_frame1.pack(side=TOP)
+
+        load_button = tk.Button(button_frame1, text="Load network")
+        load_button.pack(side=LEFT, padx=8)
+        save_button = tk.Button(button_frame1, text="Save network")
+        save_button.pack(side=LEFT, padx=8)
+
+        sub2_button = tk.Button(button_frame1, text="Go to the subframe2",
+                                command=lambda: controller.show_frame("subframe2"))
+        sub2_button.pack(side=LEFT, padx=8)
+        sub3_button = tk.Button(button_frame1, text="Go to the subframe3",
+                                command=lambda: controller.show_frame("subframe3"))
+        sub3_button.pack(side=LEFT, padx=8)
+        button = tk.Button(button_frame1, text="Go to the main_frame",
+                           command=lambda: controller.show_frame("main_frame"))
+        button.pack(side=LEFT, padx=8)
+
+        user_input_frame1 = tk.Frame(self, height=button_frame_height, width=content_frame_width)
+        user_input_frame1.pack(side=TOP)
+        input_box = tk.Entry(user_input_frame1, width=40, bd=0)
+        input_box.place(relx=0.3)
+        input_box.focus_set()
+
+        text_label = Label(user_input_frame1, text="Input: ")
+        text_label.place(relx=0.2)
+        show_activation_button = tk.Button(user_input_frame1, text="show_activation",
+                                           command=lambda: self.retrive_input(input_box.get()))
+        show_activation_button.place(relx=0.8)
+
+    def retrive_input(self, input_string):
+        if not input_string:
+            print("Please enter a string")
+        else:
+            print(input_string)
+
+
+class subframe2(tk.Frame):
+    # 	class subframe2
+    # 		content_frame2
+    # 			- plot of error of the network learning over time
+    # 			- maybe some other plots too, like accuracy on specific words
+    # 		user_input_frame1
+    # 			- train buttons that train for a specified number of epochs, plotting change in error every n epochs
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        label = tk.Label(self, text="subframe2")
+        label.pack(side="top", fill="x", pady=5)
+
+        content_frame2 = tk.Frame(self, height=content_frame_height, width=content_frame_width, bd=0, padx=0, pady=0)
+        content_frame2.pack(side=BOTTOM)
+
+        graph_canvas = tk.Canvas(content_frame2, height=content_frame_height, width=content_frame_width,
+                                 bd=5, bg='#333333', highlightthickness=0, relief='ridge')
+        graph_canvas.pack()
+
+        button_frame2 = tk.Frame(self, height=button_frame_height, width=content_frame_width)
+        button_frame2.pack(side=TOP)
+
+        train_button = tk.Button(button_frame2, text="Train")
+        train_button.pack(side=LEFT, padx=8)
+        load_button = tk.Button(button_frame2, text="Load network")
+        load_button.pack(side=LEFT, padx=8)
+        save_button = tk.Button(button_frame2, text="Save network")
+        save_button.pack(side=LEFT, padx=8)
+
+        sub1_button = tk.Button(button_frame2, text="Go to the subframe1",
+                                command=lambda: controller.show_frame("subframe1"))
+        sub1_button.pack(side=LEFT, padx=8)
+        sub3_button = tk.Button(button_frame2, text="Go to the subframe3",
+                                command=lambda: controller.show_frame("subframe3"))
+        sub3_button.pack(side=LEFT, padx=8)
+        button = tk.Button(button_frame2, text="Go to the main_frame",
+                           command=lambda: controller.show_frame("main_frame"))
+        button.pack(side=LEFT, padx=8)
+
+
+class subframe3(tk.Frame):
+    # 	class subframe3
+    # 		content_frame3
+    # 			- some sort of analyses of the hidden states
+    # 				dog = cat, shoe = sock
+    # 		button_frame3
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        label = tk.Label(self, text="subframe3")
+        label.pack(side="top", fill="x", pady=5)
+
+        content_frame3 = tk.Frame(self, height=content_frame_height, width=content_frame_width, bd=0, padx=0, pady=0)
+        content_frame3.pack(side=BOTTOM)
+
+        graph_canvas = tk.Canvas(content_frame3, height=content_frame_height, width=content_frame_width,
+                                 bd=5, bg='#333333', highlightthickness=0, relief='ridge')
+        graph_canvas.pack()
+
+        button_frame3 = tk.Frame(self, height=button_frame_height, width=content_frame_width)
+        button_frame3.pack(side=TOP)
+
+        load_button = tk.Button(button_frame3, text="Load network")
+        load_button.pack(side=LEFT, padx=8)
+        save_button = tk.Button(button_frame3, text="Save network")
+        save_button.pack(side=LEFT, padx=8)
+
+        sub1_button = tk.Button(button_frame3, text="Go to the subframe1",
+                                command=lambda: controller.show_frame("subframe1"))
+        sub1_button.pack(side=LEFT, padx=8)
+        sub2_button = tk.Button(button_frame3, text="Go to the subframe2",
+                                command=lambda: controller.show_frame("subframe2"))
+        sub2_button.pack(side=LEFT, padx=8)
+        button = tk.Button(button_frame3, text="Go to the main_frame",
+                           command=lambda: controller.show_frame("main_frame"))
+        button.pack(side=LEFT, padx=8)
+
+
+if __name__ == "__main__":
+    display = Display()
+    display.mainloop()
+
+# class display
+# 	main_frame
+# 	subframe1
+# 	subframe2
+# 	subframe3
+# 	button_frame
+# class main_frame
+# 	class subframe1
+# 		content_frame1
+# 			- what are the activations in H and Y for the current X
+# 		user_input_frame1
+# 			- has a text input field where you can type a word or string of words
+# 			- ‘go’ button, that calls update for this subframe only, which redraws this subframe only
+# 		update_screen()
+# 			erases everything in main_frame
+# 			draws all subframe1 objects
+# 	class subframe2
+# 		content_frame2
+# 			- plot of error of the network learning over time
+# 			- maybe some other plots too, like accuracy on specific words
+# 		user_input_frame1
+# 			- train buttons that train for a specified number of epochs, plotting change in error every n epochs
+# 	class subframe3
+# 		content_frame3
+# 			- some sort of analyses of the hidden states
+# 				dog = cat, shoe = sock
+# 		button_frame3
+# class button_frame
+# 	load network button
+# 	save network button
+# 	sf1 button (calls subframe1.update_screen())
+# 	sf2 button (calls subframe2.update_screen())
+# 	sf3 button (calls subframe3.update_screen())
+# 	quit button

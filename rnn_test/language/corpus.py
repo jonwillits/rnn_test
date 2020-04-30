@@ -4,8 +4,11 @@ import pickle
 import sys
 
 
+####################################################################################################
+####################################################################################################
 class Corpus:
 
+    ####################################################################################################
     def __init__(self, name):
         self.name = name
         self.language = None
@@ -20,6 +23,9 @@ class Corpus:
         self.vocab_index_dict = {}
         self.vocab_freq_dict = {}
 
+    ####################################################################################################
+    def generate_corpus(self, language, num_documents, num_sentences):
+
         if os.path.exists("corpora/" + self.name):
             response = input("Directory {} exists. Replace? (y/n)".format(self.name))
             if response == 'y' or response == 'Y':
@@ -30,8 +36,6 @@ class Corpus:
                 shutil.rmtree("corpora/" + self.name)
             else:
                 sys.exit()
-
-    def generate_corpus(self, language, num_documents, num_sentences):
 
         self.language = language
 
@@ -65,6 +69,7 @@ class Corpus:
                 self.vocab_index_dict[word] = counter
                 counter += 1
 
+    ####################################################################################################
     def save_corpus(self):
 
         try:
@@ -108,6 +113,7 @@ class Corpus:
         pickle.dump(self, outfile)
         outfile.close()
 
+    ####################################################################################################
     def load_corpus(self, name):
         self.name = name
         corpus_file_name = "corpora/" + name + "/corpus_object.p"
@@ -132,21 +138,25 @@ class Corpus:
         return output_string
 
 
+####################################################################################################
+####################################################################################################
 class Document:
 
+    ####################################################################################################
     def __init__(self, index):
         self.index = index
         self.num_sentences = 0
         self.num_tokens = 0
         self.sentence_list = []
 
+    ####################################################################################################
     def add_sentence(self, sentence):
         self.sentence_list.append(sentence)
         self.num_sentences += 1
         self.num_tokens += sentence.length
 
+    ####################################################################################################
     def __str__(self):
-        output_string = 'Document(' + self.index + ')\n'
-        for sentence in self.sentence_list:
-            output_string += sentence
+        output_string = 'Document(' + str(self.index) + ')'
+        output_string += '    {} sentences with {} tokens'.format(self.num_sentences, self.num_tokens)
         return output_string

@@ -2,8 +2,11 @@ from rnn_test.language import languages
 import random
 
 
+####################################################################################################
+####################################################################################################
 class SimpleAnimalWorld(languages.Language):
 
+    ####################################################################################################
     def __init__(self):
         super().__init__()
 
@@ -23,9 +26,7 @@ class SimpleAnimalWorld(languages.Language):
             'unknown': ['UNKNOWN']
         }
 
-    def generate_document(self):
-        pass
-
+    ####################################################################################################
     def generate_sentence(self):
 
         sentence = languages.Sentence()
