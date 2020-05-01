@@ -10,7 +10,7 @@ class SRN(nn.Module):
     def __init__(self):
 
         super(SRN, self).__init__()
-        self.name = None
+        self.name = "SRN"
         self.start_datetime = None
         self.training_set = None
 
@@ -61,7 +61,13 @@ class SRN(nn.Module):
                                                self.start_datetime[4],
                                                self.start_datetime[5],
                                                self.start_datetime[6])
+
+        if not os.path.isdir("models/"):
+            os.mkdir("models/")
         os.mkdir("models/" + self.name)
+        file_location = 'models/' + self.name + '/performance.csv'
+        outfile = open(file_location, 'w')
+        outfile.write("epoch,mean_loss\n")
 
     def init_weights(self, m):
         m.weight.data.uniform_(-self.weight_init, self.weight_init)
@@ -83,6 +89,13 @@ class SRN(nn.Module):
         o_prob = torch.nn.functional.softmax(z_o, dim=1)
         return h, z_o, o, o_prob
 
+    def test_item(self, x, old_h, y, torch_optimizer):
+        h, z_o, o, o_prob = self.forward_item(x, old_h)
+        torch_optimizer.zero_grad()
+        index = torch.argmax(y).unsqueeze(dim=0)
+        loss = self.criterion(z_o, index)
+        return h, z_o, o, o_prob, loss
+
     def train_item(self, x, old_h, y, torch_optimizer):
         h, z_o, o, o_prob = self.forward_item(x, old_h)
         torch_optimizer.zero_grad()
@@ -91,6 +104,13 @@ class SRN(nn.Module):
         loss.backward(retain_graph=True)
         torch_optimizer.step()
         return h, o, o_prob, loss
+
+    def save_performance(self, performance_list):
+        file_location = 'models/' + self.name + '/performance.csv'
+        outfile = open(file_location, 'a')
+        output_string = ','.join(map(str, performance_list))
+        outfile.write(output_string+'\n')
+        outfile.close()
 
     def save_model(self):
         file_location = 'models/' + self.name + '/dataset.p'
@@ -101,7 +121,9 @@ class SRN(nn.Module):
         file_location = "models/" + self.name + "/vocab.csv"
         f = open(file_location, 'w')
         for word in self.training_set.vocab_list:
-            f.write('{},{}\n'.format(word, self.training_set.vocab_category_dict[word]))
+            index = self.training_set.vocab_index_dict[word]
+            category = self.training_set.vocab_category_dict[word]
+            f.write('{},{},{}\n'.format(index, word, category))
         f.close()
 
     def load_model(self, name):

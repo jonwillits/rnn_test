@@ -25,9 +25,11 @@ class Corpus:
 
     ####################################################################################################
     def generate_corpus(self, language, num_documents, num_sentences):
+        if not os.path.isdir("corpora/"):
+            os.mkdir("corpora")
 
         if os.path.exists("corpora/" + self.name):
-            response = input("Directory {} exists. Replace? (y/n)".format(self.name))
+            response = input("    Corpus directory {} exists. Replace? (y/n)".format(self.name))
             if response == 'y' or response == 'Y':
                 replace = True
             else:
@@ -80,22 +82,14 @@ class Corpus:
 
         f = open('corpora/' + self.name + '/language_vocab_list.txt', 'w')
         for token in self.language.vocab_list:
-            if token.label in self.vocab_freq_dict:
-                freq = self.vocab_freq_dict[token.label]
-            else:
-                freq = 0
-            f.write('{} {} {} {}\n'.format(token.index, token.label, token.category, freq))
+            f.write('{} {} {} {}\n'.format(token.index, token.label, token.category, token.freq))
         f.close()
 
         f = open('corpora/' + self.name + '/corpus_vocab_list.txt', 'w')
         for token in self.language.vocab_list:
             if token.label in self.vocab_index_dict:
-                index = self.vocab_index_dict[token.label]
-                if token.label in self.vocab_freq_dict:
-                    freq = self.vocab_freq_dict[token.label]
-                else:
-                    freq = 0
-                f.write('{} {} {} {}\n'.format(index, token.label, token.category, freq))
+                corpus_index = self.vocab_index_dict[token.label]
+                f.write('{} {} {} {}\n'.format(corpus_index, token.label, token.category, token.freq))
         f.close()
 
         f = open('corpora/' + self.name + '/corpus.txt', 'w')
@@ -111,6 +105,11 @@ class Corpus:
         file_location = "corpora/" + self.name + "/corpus_object.p"
         outfile = open(file_location, 'wb')
         pickle.dump(self, outfile)
+        outfile.close()
+
+        file_location = "corpora/" + self.name + "/language_object.p"
+        outfile = open(file_location, 'wb')
+        pickle.dump(self.language, outfile)
         outfile.close()
 
     ####################################################################################################

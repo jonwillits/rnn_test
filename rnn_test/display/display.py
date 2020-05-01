@@ -22,7 +22,7 @@ class Display(tk.Tk):
         container.pack(side="top", fill="both", expand=True)
 
         self.main_frames = {}
-        for F in (main_frame, subframe1, subframe2, subframe3):
+        for F in (subframe1, subframe2, subframe3):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.main_frames[page_name] = frame
@@ -32,12 +32,33 @@ class Display(tk.Tk):
             # will be the one that is visible.
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame("main_frame")
+        self.show_frame("subframe1")
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
         frame = self.main_frames[page_name]
         frame.tkraise()
+
+    def create_buttom(self, page, controller):
+        button_frame = tk.Frame(page, height=button_frame_height, width=content_frame_width)
+        button_frame.pack(side=TOP)
+
+        load_button = tk.Button(button_frame, text="Load network")
+        load_button.pack(side=LEFT, padx=8)
+        save_button = tk.Button(button_frame, text="Save network")
+        save_button.pack(side=LEFT, padx=8)
+
+        sub1_button = tk.Button(button_frame, text="Go to the subframe1",
+                                command=lambda: controller.show_frame("subframe1"))
+        sub1_button.pack(side=LEFT, padx=8)
+        sub2_button = tk.Button(button_frame, text="Go to the subframe2",
+                                command=lambda: controller.show_frame("subframe2"))
+        sub2_button.pack(side=LEFT, padx=8)
+        sub3_button = tk.Button(button_frame, text="Go to the subframe3",
+                                command=lambda: controller.show_frame("subframe3"))
+        sub3_button.pack(side=LEFT, padx=8)
+        quit_button = ttk.Button(button_frame, text="Quit", width=8, command=sys.exit)
+        quit_button.pack(side=tk.LEFT, padx=8)
 
     def load_network(self):
         pass
@@ -47,31 +68,6 @@ class Display(tk.Tk):
 
     def train_network(self):
         pass
-
-
-class main_frame(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        self.controller = controller
-        label = tk.Label(self, text="main_frame")
-        label.pack(side="top", fill="x", pady=5)
-
-        button_frame = tk.Frame(self, height=button_frame_height, width=content_frame_width)
-        button_frame.pack(side=TOP)
-
-        button1 = tk.Button(button_frame, text="Go to subframe1",
-                            command=lambda: controller.show_frame("subframe1"))
-        button2 = tk.Button(button_frame, text="Go to subframe2",
-                            command=lambda: controller.show_frame("subframe2"))
-        button3 = tk.Button(button_frame, text="Go to subframe3",
-                            command=lambda: controller.show_frame("subframe3"))
-        quit_button = ttk.Button(button_frame, text="Quit", width=8, command=sys.exit)
-
-        button1.pack(side=LEFT, padx=8)
-        button2.pack(side=LEFT, padx=8)
-        button3.pack(side=LEFT, padx=8)
-        quit_button.pack(side=tk.LEFT, padx=8)
 
 
 class subframe1(tk.Frame):
@@ -96,23 +92,7 @@ class subframe1(tk.Frame):
                                  bd=5, bg='#333333', highlightthickness=0, relief='ridge')
         graph_canvas.pack()
 
-        button_frame1 = tk.Frame(self, height=button_frame_height, width=content_frame_width)
-        button_frame1.pack(side=TOP)
-
-        load_button = tk.Button(button_frame1, text="Load network")
-        load_button.pack(side=LEFT, padx=8)
-        save_button = tk.Button(button_frame1, text="Save network")
-        save_button.pack(side=LEFT, padx=8)
-
-        sub2_button = tk.Button(button_frame1, text="Go to the subframe2",
-                                command=lambda: controller.show_frame("subframe2"))
-        sub2_button.pack(side=LEFT, padx=8)
-        sub3_button = tk.Button(button_frame1, text="Go to the subframe3",
-                                command=lambda: controller.show_frame("subframe3"))
-        sub3_button.pack(side=LEFT, padx=8)
-        button = tk.Button(button_frame1, text="Go to the main_frame",
-                           command=lambda: controller.show_frame("main_frame"))
-        button.pack(side=LEFT, padx=8)
+        controller.create_buttom(self, controller)
 
         user_input_frame1 = tk.Frame(self, height=button_frame_height, width=content_frame_width)
         user_input_frame1.pack(side=TOP)
@@ -123,10 +103,10 @@ class subframe1(tk.Frame):
         text_label = Label(user_input_frame1, text="Input: ")
         text_label.place(relx=0.2)
         show_activation_button = tk.Button(user_input_frame1, text="show_activation",
-                                           command=lambda: self.retrive_input(input_box.get()))
+                                           command=lambda: self.retrieve_input(input_box.get()))
         show_activation_button.place(relx=0.8)
 
-    def retrive_input(self, input_string):
+    def retrieve_input(self, input_string):
         if not input_string:
             print("Please enter a string")
         else:
@@ -153,25 +133,13 @@ class subframe2(tk.Frame):
                                  bd=5, bg='#333333', highlightthickness=0, relief='ridge')
         graph_canvas.pack()
 
+        controller.create_buttom(self, controller)
+
         button_frame2 = tk.Frame(self, height=button_frame_height, width=content_frame_width)
         button_frame2.pack(side=TOP)
 
         train_button = tk.Button(button_frame2, text="Train")
         train_button.pack(side=LEFT, padx=8)
-        load_button = tk.Button(button_frame2, text="Load network")
-        load_button.pack(side=LEFT, padx=8)
-        save_button = tk.Button(button_frame2, text="Save network")
-        save_button.pack(side=LEFT, padx=8)
-
-        sub1_button = tk.Button(button_frame2, text="Go to the subframe1",
-                                command=lambda: controller.show_frame("subframe1"))
-        sub1_button.pack(side=LEFT, padx=8)
-        sub3_button = tk.Button(button_frame2, text="Go to the subframe3",
-                                command=lambda: controller.show_frame("subframe3"))
-        sub3_button.pack(side=LEFT, padx=8)
-        button = tk.Button(button_frame2, text="Go to the main_frame",
-                           command=lambda: controller.show_frame("main_frame"))
-        button.pack(side=LEFT, padx=8)
 
 
 class subframe3(tk.Frame):
@@ -193,23 +161,7 @@ class subframe3(tk.Frame):
                                  bd=5, bg='#333333', highlightthickness=0, relief='ridge')
         graph_canvas.pack()
 
-        button_frame3 = tk.Frame(self, height=button_frame_height, width=content_frame_width)
-        button_frame3.pack(side=TOP)
-
-        load_button = tk.Button(button_frame3, text="Load network")
-        load_button.pack(side=LEFT, padx=8)
-        save_button = tk.Button(button_frame3, text="Save network")
-        save_button.pack(side=LEFT, padx=8)
-
-        sub1_button = tk.Button(button_frame3, text="Go to the subframe1",
-                                command=lambda: controller.show_frame("subframe1"))
-        sub1_button.pack(side=LEFT, padx=8)
-        sub2_button = tk.Button(button_frame3, text="Go to the subframe2",
-                                command=lambda: controller.show_frame("subframe2"))
-        sub2_button.pack(side=LEFT, padx=8)
-        button = tk.Button(button_frame3, text="Go to the main_frame",
-                           command=lambda: controller.show_frame("main_frame"))
-        button.pack(side=LEFT, padx=8)
+        controller.create_buttom(self, controller)
 
 
 if __name__ == "__main__":
