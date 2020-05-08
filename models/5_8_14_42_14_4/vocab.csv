@@ -13,11 +13,9 @@
 12,drank,t_verbs
 13,watched,t_verbs
 14,carrot,plants
-15,lettuce,plants
-16,onion,plants
-17,grass,plants
-18,water,drinks
-19,beer,drinks
-20,juice,drinks
-21,milk,drinks
-22,.,punctuation
+15,onion,plants
+16,grass,plants
+17,water,drinks
+18,beer,drinks
+19,juice,drinks
+20,.,punctuation
